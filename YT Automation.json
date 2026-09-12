@@ -1,0 +1,859 @@
+{
+  "name": "YT Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -528,
+        -16
+      ],
+      "id": "f95c70e2-c799-450d-b80c-d043dbe2990b",
+      "name": "When chat message received",
+      "webhookId": "bf8e99b1-b7d2-4c0f-a3a2-c67d2ea1c7db"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.chatInput }}"
+            },
+            {
+              "content": "==CRITICAL: Your entire response must be ONLY the JSON array. No preamble, no \"Let's begin\", no acknowledgment, no text before or after the JSON. The first character of your response must be [ and the last character must be ].\nYou are a content strategist and prompt engineer for a faceless AI-generated motivation/discipline YouTube Shorts and Instagram Reels channel, styled after \"Ben Lionel Scott\" — a genre known for hyper-realistic AI-generated muscular male characters, deep cinematic voiceovers, gritty urban or dark gym settings, and high-contrast dramatic lighting.\nYour job is to generate complete content ideas for this channel based on the user's request. Each idea must feel authentic to this genre — themes include discipline, waking up early, gym/physical grind, mental toughness, self-improvement, no excuses, consistency, and inner strength.\nFor every content idea, you must output these exact fields:\n\n\"idea\" — A short, punchy content concept/title (5-10 words)\n\"caption\" — A social media caption with an emotional hook, 1-2 short punchy sentences, ending with 3-5 relevant hashtags\n\"channel_style\" — The visual/audio production style for this specific piece (lighting, pacing, voiceover tone, color grading, setting type)\n\"prompt\" — A detailed AI image/video generation prompt (for tools like Midjourney, Flux, or similar), written as a single descriptive paragraph including: character description, setting, lighting, camera angle, mood, and cinematic quality tags\n\"character_style\" — A consistent description of the character's physical appearance and demeanor (build, clothing, expression, color palette) so the character stays visually consistent across the channel\n\"status\" — Always set this to \"Not Started\"\nRules:\n\nNever break character or explain your reasoning — output ONLY the requested JSON.\nAlways generate exactly ONE idea per response, regardless of what the user asks for. Never generate multiple ideas or an array. If the user's message implies more than one idea, still generate only one — the best, most relevant single idea for their request.\nVary the sub-theme across ideas (e.g., mix waking up early, gym grind, mental toughness, consistency) unless the user specifies a single theme.\nKeep all AI image prompts hyper-realistic, cinematic, and production-ready — avoid vague or generic descriptions.\nDo not include any markdown formatting, code fences, or explanatory text outside the JSON.\nOutput format — return ONLY a valid JSON array, structured exactly like this:\n[\n   {\n     \"idea\": \"string\",\n      \"caption\": \"string\",\n      \"channel_style\": \"string\",\n      \"prompt\": \"string\",\n      \"character_style\": \"string\",\n      \"status\": \"Not Started\" \n    }\n]",
+              "role": "model"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -304,
+        -16
+      ],
+      "id": "2e720f7a-b262-4606-9510-a634d65cce83",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9S4h1O8i4qwCpGrk",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const parts = $input.first().json.content.parts;\nlet raw = parts.map(p => p.text || '').join('').trim();\n\n// Remove markdown code fences if present\nraw = raw.replace(/^```json\\s*/i, '').replace(/^```\\s*/i, '').replace(/\\s*```$/, '');\n\nconst ideas = JSON.parse(raw);\n\nreturn ideas.map(item => ({\n  json: {\n    idea: item.idea,\n    caption: item.caption,\n    channel_style: item.channel_style,\n    prompt: item.prompt,\n    character_style: item.character_style,\n    status: item.status\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -16
+      ],
+      "id": "2c23c321-e2fe-4a55-a3c9-adcc7400f196",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appy5wgPFx6VBSLqQ",
+          "mode": "list",
+          "cachedResultName": "YT Automation",
+          "cachedResultUrl": "https://airtable.com/appy5wgPFx6VBSLqQ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblb4hKjS7o4jg0I5",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appy5wgPFx6VBSLqQ/tblb4hKjS7o4jg0I5"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Idea": "={{ $json.idea }}",
+            "Caption": "={{ $json.caption }}",
+            "Channel Style": "={{ $json.channel_style }}",
+            "Prompt": "={{ $json.prompt }}",
+            "Character Style": "={{ $json.character_style }}",
+            "Status": "todo"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Idea",
+              "displayName": "Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Caption",
+              "displayName": "Caption",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Channel Style",
+              "displayName": "Channel Style",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Prompt",
+              "displayName": "Prompt",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Character Style",
+              "displayName": "Character Style",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "todo",
+                  "value": "todo"
+                },
+                {
+                  "name": "done",
+                  "value": "done"
+                },
+                {
+                  "name": "error",
+                  "value": "error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        -16
+      ],
+      "id": "76f6f075-4fd5-45f6-bfc1-d6bede9f6d01",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "PKy4U0WX2i2QwVIF",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3-flash-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Generate a full 12-clip video script based on this content:\n\nIdea: {{ $json.fields.Idea }}\nCaption: {{ $json.fields.Caption }}\nChannel Style: {{ $json.fields[\"Channel Style\"] }}\nCharacter Style: {{ $json.fields[\"Character Style\"] }}"
+            },
+            {
+              "content": "You are a scriptwriter and prompt engineer for a faceless AI-generated motivation/discipline YouTube channel, styled after \"Ben Lionel Scott\" — hyper-realistic AI-generated muscular characters, deep cinematic voiceover, gritty urban/gym settings, high-contrast dramatic lighting.\n\nYou will receive one Idea, Caption, Channel Style, and Character Style as input context. Your job is to expand this into a full video script broken into exactly 12 sequential clips, plus one intro line, for a 3-minute video.\n\nEach clip must:\n- Continue a single coherent narrative arc from beginning (struggle/setup) through middle (the grind/turning point) to end (triumph/resolution) — do not repeat the same line or image concept across clips.\n- Have a \"voiceText\" of 30-40 words, written as a deep, motivational, second-person voiceover line (direct, punchy, cinematic — short sentences, no filler).\n- Have an \"image_prompt\" that is a hyper-realistic, cinematic AI image generation prompt matching the Character Style provided, describing a specific moment, action, or emotion tied to that clip's voiceText. Always maintain the same character across all 12 clips (consistent build, clothing, and visual identity as defined in Character Style) — only the setting, action, lighting, and camera angle should change clip to clip.\n- Vary camera framing across the script (mix of wide shots, close-ups, low angles, silhouettes) so the video doesn't feel visually repetitive.\n\nAlso generate:\n- \"introText\": A short, powerful title line (5-8 words) that will appear as bold text over the opening video, summarizing the video's theme.\n\nCRITICAL: Your entire response must be ONLY the JSON object below. No preamble, no explanation, no markdown formatting, no code fences. The first character must be { and the last character must be }.\n\nOutput format:\n{\n  \"introText\": \"string\",\n  \"clips\": [\n    {\n      \"voiceText\": \"string\",\n      \"image_prompt\": \"string\"\n    }\n  ]\n}\n\nThe clips array must contain exactly 12 objects, no more, no fewer.",
+              "role": "model"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        -16
+      ],
+      "id": "4555512f-689f-4b75-8148-5aeb0371c2fb",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9S4h1O8i4qwCpGrk",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $input.first().json.content.parts[0].text;\nconst parsed = typeof output === 'string' ? JSON.parse(output.trim()) : output;\n\nconst introText = parsed.introText;\n\nreturn parsed.clips.map((clip, index) => ({\n  json: {\n    introText: introText,\n    clipNumber: index + 1,\n    voiceText: clip.voiceText,\n    image_prompt: clip.image_prompt\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -16
+      ],
+      "id": "d12348d2-4fef-4611-a51d-b3624b360538",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst introText = items[0].json.introText;\n\nconst clips = items.map(item => ({\n  voiceText: item.json.voiceText,\n  image_prompt: item.json.image_prompt\n}));\n\nreturn [{\n  json: {\n    template: \"OOBCbrvfCvPH7heO3mdb\",\n    variables: {\n      introText: introText,\n      clips: clips\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        -16
+      ],
+      "id": "88f96e61-9316-4b12-9c10-1ee3ab8ff7d9",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.json2video.com/v2/movies",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1328,
+        -16
+      ],
+      "id": "79dd525b-cc2e-48cf-9c96-a8712374076c",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "8OhtUCQNido7USfE",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 120
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        240
+      ],
+      "id": "e8dd9364-9dbb-41bf-b46a-aa0f7029f5bb",
+      "name": "Wait",
+      "webhookId": "65bf9a55-2a26-49f1-8312-f96dae29baa5"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.json2video.com/v2/movies?project={{ $json.project }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        608,
+        240
+      ],
+      "id": "1261bcad-2e36-4d5d-8468-f75d442b9d8f",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "8OhtUCQNido7USfE",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "=",
+                    "rightValue": "done",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b45c040d-ecd3-4bc1-9346-84d20a6d91d5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DONE"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ab801827-d1ac-4185-8a53-27817c725efe",
+                    "leftValue": "=={{ $json.movie.status }}",
+                    "rightValue": "running",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "RUNNING"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "03bef18e-49f0-4f3a-beb7-aa9269276a54",
+                    "leftValue": "=={{ $json.movie.status }}",
+                    "rightValue": "error",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ERROR"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        240
+      ],
+      "id": "5be557fe-498e-4bb1-99fa-8b9f92426153",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appy5wgPFx6VBSLqQ",
+          "mode": "list",
+          "cachedResultName": "YT Automation",
+          "cachedResultUrl": "https://airtable.com/appy5wgPFx6VBSLqQ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblb4hKjS7o4jg0I5",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appy5wgPFx6VBSLqQ/tblb4hKjS7o4jg0I5"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "error"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Idea",
+              "displayName": "Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Caption",
+              "displayName": "Caption",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Channel Style",
+              "displayName": "Channel Style",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Prompt",
+              "displayName": "Prompt",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Character Style",
+              "displayName": "Character Style",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "todo",
+                  "value": "todo"
+                },
+                {
+                  "name": "done",
+                  "value": "done"
+                },
+                {
+                  "name": "error",
+                  "value": "error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1056,
+        352
+      ],
+      "id": "e41e30e8-3e28-41b5-9f62-f16bec66ef9c",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "PKy4U0WX2i2QwVIF",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appy5wgPFx6VBSLqQ",
+          "mode": "list",
+          "cachedResultName": "YT Automation",
+          "cachedResultUrl": "https://airtable.com/appy5wgPFx6VBSLqQ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblb4hKjS7o4jg0I5",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appy5wgPFx6VBSLqQ/tblb4hKjS7o4jg0I5"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "done"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Idea",
+              "displayName": "Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Caption",
+              "displayName": "Caption",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Channel Style",
+              "displayName": "Channel Style",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Prompt",
+              "displayName": "Prompt",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Character Style",
+              "displayName": "Character Style",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "todo",
+                  "value": "todo"
+                },
+                {
+                  "name": "done",
+                  "value": "done"
+                },
+                {
+                  "name": "error",
+                  "value": "error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1056,
+        192
+      ],
+      "id": "e808e3cc-685a-4e2f-9f83-cc3312b418e5",
+      "name": "Update record1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "PKy4U0WX2i2QwVIF",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2112,
+        1296
+      ],
+      "id": "49d11ecf-55fc-4c2e-8542-57302ec38dd4",
+      "name": "HTTP Request2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Update record1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update record1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f86e5e77-4e50-41f5-8475-0e945b334c9f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90e0b6cf8de4bb989877b7ce7198466c9126b4e19a414149cb541333acfc117a"
+  },
+  "nodeGroups": [],
+  "id": "UTIPHzja9RGupHLD",
+  "tags": []
+}
