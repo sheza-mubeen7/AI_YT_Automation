@@ -8,21 +8,6 @@ Creating YouTube videos involves multiple repetitive steps: content planning, sc
 
 This workflow automates these processes using **n8n, Airtable, and Google Gemini 2.5 Flash**, reducing manual work and creating a repeatable content production pipeline.
 
-## ⚙️ Workflow
-
-Airtable
-   ↓
-Content / Topic Input
-   ↓
-n8n Automation
-   ↓
-Google Gemini 2.5 Flash
-   ↓
-Structured JSON Output
-   ↓
-JSON-to-Video Pipeline
-   ↓
-Video-Ready Content
 
 ## ✨ Key Features
 
