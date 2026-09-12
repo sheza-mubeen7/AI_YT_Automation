@@ -61,7 +61,11 @@ Instead of manually handling every step, the workflow creates a structured pipel
 
 ## 📸 Workflow Preview
 
-_Add screenshots of the n8n workflow and generated output here._
+
+
+https://github.com/user-attachments/assets/d51dfdf3-28d4-465e-92ec-47bd61638cb9
+
+
 
 ## 🔮 Future Improvements
 
